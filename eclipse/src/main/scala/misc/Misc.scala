@@ -58,21 +58,23 @@ object Misc {
       println("Value of a: " + a)
     }
     
-    val laura = Person("Laura", false, Nil)
-    val bob = Person("Bob", true, Nil)
-    val julie = Person("Julie", false, List(laura, bob))
-    val john = Person("John", true, List(laura, bob))
-    val persons = List(laura, bob, julie, john)  
-     
-    val prenom = "Julie"
+    val books: List[Book] = List(
+    Book("Structure and Interpretation of Computer Programs", List("Abelson, Harold", "Sussman, Gerald J.")),
+    Book("Principles of Compiler Design", List("Aho, Alfred", "Ullman, Jeffrey")),
+    Book("Programming in Modula-2", List("Wirth, Niklaus")),
+    Book("Introduction to Functional Programming", List("Bird, Richard")),
+    Book("The Java Language Specification", List("Gosling, James", "Joy, Bill", "Steele, Guy", "Bracha, Gilad")))
     
-    val res = for {
-      p <- persons
-      c <- p.enfants
-      if p.prenom == prenom
-    } yield c
+    println(getInfos(books))
     
-    println(res)
+    lazy val rates: Map[String, BigDecimal] =
+    {
+      val url = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
+      for (e <- xml.XML.load(url) \ "Cube" \ "Cube" \ "Cube")
+        yield ((e \ "@currency").text -> BigDecimal((e \ "@rate").text))
+    }.toMap ++ Map[String, BigDecimal]("EUR" -> 1)
+    
+    println(rates("USD"))
     
   }
 
@@ -160,26 +162,43 @@ object Misc {
     Book("Introduction to Functional Programming", List("Bird, Richard")),
     Book("The Java Language Specification", List("Gosling, James", "Joy, Bill", "Steele, Guy", "Bracha, Gilad")))
 
-  /*
   def getInfos(books: List[Book]) : List[String] = {
-    val ullmans = for {
+    var ullmans = for {
       b <- books
-      if b.authors.contains("Ullman")
+      if b.authors.contains("Ullman, Jeffrey")
     } yield b.title
     
-    val programs = for {
+    var programs = for {
       b <- books
-      if b.title.contains("Program")
+      if b.title contains "Program"
     } yield b.title
     
-    var passed_aut: List[String] = Nil
-    val aut = for {
-      b <- books
-      passed_aut = passed_aut:::b.authors
-     
+    def getAuthors(books: List[Book]) : List[String] = {
+      books match {
+        case Nil => Nil
+        case elem::reste => elem.authors:::getAuthors(reste)
+      }
     }
+    
+    def multipleAuthors(authors: List[String], already: List[String]) : List[String] = {
+      authors match {
+        case Nil => Nil
+        case elem::Nil => Nil
+        case elem::reste if !already.contains(elem) && authors.count(_ == elem) > 1 => 
+          elem::multipleAuthors(reste, elem::already)
+        case elem::reste => multipleAuthors(reste, already) 
+      }
+    }
+    
+    val authors = multipleAuthors(getAuthors(books), List())
+    var multiple = for {
+      b <- books
+      a <- b.authors
+      if authors.contains(a)
+    } yield b.title
+    
+    (ullmans:::programs:::multiple).distinct
   }
-  */
     
   /**
    * Accès aux éléments d'un n-uplet
@@ -212,7 +231,13 @@ object Misc {
    * currency : AUD rate: 1.3807
    * ......
    */
-  def printRates(rates: Map[String, BigDecimal]) = ???
+  def printRates(rates: Map[String, BigDecimal]) = {
+    def print_fun(tuple: (String, BigDecimal)) = {
+      println()
+    }
+    
+    rates.foreach(print_fun)
+  }
 
   /**
    * Exercice 8
