@@ -12,6 +12,8 @@ object Misc {
     {
       if (!list.isEmpty)
         list.contains(elem)
+      else
+        false
     }
 
   /**
@@ -55,6 +57,23 @@ object Misc {
     for (a <- retVal) {
       println("Value of a: " + a)
     }
+    
+    val laura = Person("Laura", false, Nil)
+    val bob = Person("Bob", true, Nil)
+    val julie = Person("Julie", false, List(laura, bob))
+    val john = Person("John", true, List(laura, bob))
+    val persons = List(laura, bob, julie, john)  
+     
+    val prenom = "Julie"
+    
+    val res = for {
+      p <- persons
+      c <- p.enfants
+      if p.prenom == prenom
+    } yield c
+    
+    println(res)
+    
   }
 
   // E X A M P L E S   B A S I C S
@@ -63,7 +82,11 @@ object Misc {
    * Exercice 2
    * Ecrire une fonction qui renvoie la liste du reste de la divison par 3 des termes d'une liste
    */
-  def modulus(myList: List[Int]): List[Int] = ???
+  def modulus(myList: List[Int]): List[Int] = {
+    for {
+        a <- myList
+    } yield a % 3 
+  }
 
   /**
    * Exercice 3
@@ -72,8 +95,16 @@ object Misc {
    *    et i + j soit premier
    */
   def isPrime(n: Int) = List.range(2, n).forall(x => n % x != 0)
-
-  def primeTuple(n: Int): List[(Int, Int)] = ???
+  
+  def primeTuple(n: Int): List[(Int, Int)] = 
+  {
+    val iList: List[Int] = List.range(1, n)
+    for {
+      i <- iList
+      j <- 1 to i-1
+      if isPrime(j+i)
+    } yield (i, j)
+  }
 
   // E X A M P L E S   O V E R   S C A L A    A R R A Y
 
@@ -96,13 +127,24 @@ object Misc {
    * Exercice 4
    * Ecrire une fonction et son test associe qui renvoie la liste des hommes
    */
-  def listMale(persons: List[Person]): List[Person] = ???
+  def listMale(persons: List[Person]): List[Person] = {
+    for {
+      p <- persons
+      if p.isMale
+    } yield p
+  }
 
   /**
    * Exercice 5
    * Ecrire une fonction et son test associe qui renvoie la list des enfants pour une personne donnee
    */
-  def childrenOf(persons: List[Person], prenom: String): List[Person] = ???
+  def childrenOf(persons: List[Person], prenom: String): List[Person] = {
+    for {
+      p <- persons
+      c <- p.enfants
+      if p.prenom == prenom
+    } yield c
+  }
 
   /**
    * Exercice 6
@@ -118,6 +160,27 @@ object Misc {
     Book("Introduction to Functional Programming", List("Bird, Richard")),
     Book("The Java Language Specification", List("Gosling, James", "Joy, Bill", "Steele, Guy", "Bracha, Gilad")))
 
+  /*
+  def getInfos(books: List[Book]) : List[String] = {
+    val ullmans = for {
+      b <- books
+      if b.authors.contains("Ullman")
+    } yield b.title
+    
+    val programs = for {
+      b <- books
+      if b.title.contains("Program")
+    } yield b.title
+    
+    var passed_aut: List[String] = Nil
+    val aut = for {
+      b <- books
+      passed_aut = passed_aut:::b.authors
+     
+    }
+  }
+  */
+    
   /**
    * Accès aux éléments d'un n-uplet
    * Vous pouvez accéder aux éléments d'un n-uplet en utilisant une syntaxe de soulignement.

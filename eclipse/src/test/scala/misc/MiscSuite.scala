@@ -45,12 +45,26 @@ class TriSuite2 extends FunSuite {
 
   //function listMale tests
   test("test isMale") {
-    assert(false)
+    val laura = Person("Laura", false, Nil)
+    val bob = Person("Bob", true, Nil)
+    val julie = Person("Julie", false, List(laura, bob))
+    val john = Person("John", true, List(laura, bob))
+    val persons = List(laura, bob, julie, john)
+    assert(listMale(persons) === List(bob, john))
+    assert(listMale(List()) === List())
   }
   
   //function childrenOf tests
   test("test childrenOf") {
-    assert(false)
+    val laura = Person("Laura", false, Nil)
+    val bob = Person("Bob", true, Nil)
+    val julie = Person("Julie", false, List(laura, bob))
+    val john = Person("John", true, List(laura, bob))
+    val persons = List(laura, bob, julie, john)
+    assert(childrenOf(persons, "Julie") === List(laura, bob))
+    assert(childrenOf(persons, "Laura") === List())
+    assert(childrenOf(persons, "John") === List(laura, bob))
+    assert(childrenOf(persons, "Batman") === List())
   }
 }
 
